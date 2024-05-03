@@ -46,7 +46,7 @@ def preprocess(x, y):
     mask= tf.one_hot(mask, num_classes)
 
     image.set_shape([image_h, image_w, 3])
-    image.set_shape([image_h, image_w, num_classes])
+    mask.set_shape([image_h, image_w, num_classes])
 
     return image, mask
 
