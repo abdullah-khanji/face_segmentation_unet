@@ -88,5 +88,17 @@ if __name__=='__main__':
     valid_dataset= tf_dataset(valid_x, valid_y, batch_size)
     test_dataset= tf_dataset(test_x, test_y, batch_size)
 
-    model = build_unet((128, 128, 3))
-    model.compile()
+    model = build_unet(input_shape, num_classes)
+    model.compile(
+        loss='categorical_crossentropy',
+        optimizer=tf.keras.optimizers.Adam(lr)
+    )
+
+    callbacks=[
+        tf.keras.callbacks.ModelCheckpoint(model_path, verbose=1, save_best_only=True, monitor='val_loss'),
+        tf.keras.callbacks.ReduceLROnPlateau(monitor='val_loss', factor=0.1, patience=5, min_lr=1e-7, verbose=1),
+        tf.keras.callbacks.CSVLogger(csv_path, append=True),
+        tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=20, restore_best_weights=False)
+    ]
+
+    model.fit(train_dataset, epochs=num_epochs, callbacks=callbacks)
